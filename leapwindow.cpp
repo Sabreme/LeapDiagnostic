@@ -298,9 +298,9 @@ void LeapWindow::LoadSlider()
     vtkSmartPointer<vtkSliderRepresentation2D> sliderRep =
       vtkSmartPointer<vtkSliderRepresentation2D>::New();
 
-    sliderRep->SetMinimumValue(0.1);
-    sliderRep->SetMaximumValue(2.0);
-    sliderRep->SetValue(1.0);
+    sliderRep->SetMinimumValue(0.2);
+    sliderRep->SetMaximumValue(2.5);
+    sliderRep->SetValue(1.25);
     sliderRep->SetTitleText("Scale");
 
     // Set color properties:
@@ -334,9 +334,9 @@ void LeapWindow::LoadSlider()
 
     global_Slider->EnabledOn();
 
-    global_LastScalePosition = 1;
+    global_LastScalePosition = 1.25;
 
-    global_CameraPosition = 1;
+    global_CameraPosition = 1.25;
 
 }
 
@@ -732,6 +732,15 @@ void LeapWindow::updateMe()
                 double newPosition = 1 / global_CameraPosition;
 
                 static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(newPosition);
+
+                /// We add color chromatic scale to the Slider Widget Propoert to highligh strength
+                if (newPosition < 1.15)
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-newPosition,newPosition,0);
+                else if (newPosition > 1.35)
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1-newPosition,newPosition-1);
+                else
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,0,0);
+
 
                  std::cout  << "scaleFactor: " << scaleFactor << "\t, oldPosition: "  << oldPosition << "\t, newPosition: "  << newPosition << "\t" << endl;
 
