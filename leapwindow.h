@@ -91,9 +91,14 @@ private:
     double global_FingerClr[5][3];
     bool global_Initialised = false;
 
-    double global_LastScalePosition;
-
     double global_CameraPosition;
+
+    int64_t global_ScaleFactorID ;  // Last  Frames Counted.
+    double scaling_Max = 10;
+    double scaling_Mid = 5;
+    double scaling_Min = 0;
+
+
 
     //double** global_TipClr = new double*[5];
 

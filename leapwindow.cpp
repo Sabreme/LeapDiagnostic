@@ -298,9 +298,9 @@ void LeapWindow::LoadSlider()
     vtkSmartPointer<vtkSliderRepresentation2D> sliderRep =
       vtkSmartPointer<vtkSliderRepresentation2D>::New();
 
-    sliderRep->SetMinimumValue(0.2);
-    sliderRep->SetMaximumValue(2.5);
-    sliderRep->SetValue(1.25);
+    sliderRep->SetMinimumValue(scaling_Min);
+    sliderRep->SetMaximumValue(scaling_Max);
+    sliderRep->SetValue(scaling_Mid);
     sliderRep->SetTitleText("Scale");
 
     // Set color properties:
@@ -334,9 +334,9 @@ void LeapWindow::LoadSlider()
 
     global_Slider->EnabledOn();
 
-    global_LastScalePosition = 1.25;
 
-    global_CameraPosition = 1.25;
+
+    global_CameraPosition = 7;
 
 }
 
@@ -606,6 +606,9 @@ void LeapWindow::updateMe()
         {
             pointWidget->GetProperty()->SetColor(1.0, 1.0, 1.0);
             global_SphereActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(scaling_Mid);
+            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1,0);
+
         }
 
 
@@ -632,6 +635,8 @@ void LeapWindow::updateMe()
         //                    << ", yaw: " << frame.hands()[0].direction().yaw()
         //                    //<< ", Angle: " << frame.rotationAngle(controller_->frame(1))
         //                    << std::endl;
+
+//        std::cout << "TRACKING: " << frame.id() << endl;
 
         if (!frame.hands().isEmpty() && !frame.hands()[0].fingers().isEmpty())
         {
@@ -722,32 +727,81 @@ void LeapWindow::updateMe()
 
                 /// Compute the Scale Factor using the leap motion factor
 
+//                std::cout  << "global_ScaleFactorID: " << global_ScaleFactorID
+
+//                            <<  "\t, FrameID: "  << controller_->frame(1).id()
+//                            <<  "\t, DIfference: "  << abs(controller_->frame(1).id() - global_ScaleFactorID)
+
+//                             << "\t" << endl;
+
+                /// The following code checks to see if the sensor has regained focus.
+                /// if so, we set the global_CameraPosition to the default value
+                /// Effectively functioning as a reset value.
+                /// We also have a skip value to true to not invert the slider.
+
+                bool do_Invert = true;
+                if (abs(controller_->frame(1).id() - global_ScaleFactorID) > 2 )
+                {
+                    global_CameraPosition = static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetValue();
+                    std::cout << "Return focus" << endl;
+                    do_Invert = false;
+                }
+
+                global_ScaleFactorID = frame.id();       //Current Frame
 
                 float scaleFactor = frame.hands()[0].scaleFactor(controller_->frame(2));
 
-                double oldPosition = static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetValue();
+                ///double oldPosition = static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetValue();    --ORIGINAL
 
-                global_CameraPosition = global_CameraPosition / scaleFactor;
+                double oldPosition = global_CameraPosition;
 
-                double newPosition = 1 / global_CameraPosition;
+                //double oldPosition = global_CameraPosition;
 
-                static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(newPosition);
+                ///global_CameraPosition = global_CameraPosition / scaleFactor;     -- ORIGINAL
+                global_CameraPosition = oldPosition / (scaleFactor);
+
+                double newPosition = global_CameraPosition;
+
+                double reversePosition = scaling_Max - newPosition;
+
+
+
+//                if (do_Invert)
+//                    newPosition = 1 / global_CameraPosition;         /// Used to Invert Slider Position expand/contract
+
+
+                static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition);
 
                 /// We add color chromatic scale to the Slider Widget Propoert to highligh strength
-                if (newPosition < 1.15)
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-newPosition,newPosition,0);
-                else if (newPosition > 1.35)
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1-newPosition,newPosition-1);
+
+                double colourRange = (reversePosition /  scaling_Max) + 0.2;
+                if (colourRange < 0.5)
+                {
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-colourRange,colourRange,0);
+                }
+                else if (colourRange > 0.5)
+                {
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1-colourRange,colourRange);
+                }
                 else
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,0,0);
+                {
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1,0);
+                }
 
 
-                 std::cout  << "scaleFactor: " << scaleFactor << "\t, oldPosition: "  << oldPosition << "\t, newPosition: "  << newPosition << "\t" << endl;
+                 std::cout  << "scaleFactor: " << scaleFactor
+                              << "\t, oldPosition: "  << oldPosition
+                              << "\t, newPosition: "  << newPosition
+                              << "\t, colourRange: "  << colourRange
+                              << "\t, CameraPos: "  << global_CameraPosition
+                             <<  "\t, FrameID: "  << frame.id()
+                              << "\t" << endl;
 
 
 
 
-            }
+            } /// Hand tracking
+
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////
             //////////////////////////    FINGER TRACKING  ///////////////////////////////////
@@ -842,7 +896,7 @@ void LeapWindow::updateMe()
                         }
                     }
                 }
-            }
+            } /// Finger Tracking
         }
     }
 }
