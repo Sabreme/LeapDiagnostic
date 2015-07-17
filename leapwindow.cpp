@@ -300,7 +300,7 @@ void LeapWindow::LoadSlider()
 
     sliderRep->SetMinimumValue(scaling_Min);
     sliderRep->SetMaximumValue(scaling_Max);
-    sliderRep->SetValue(scaling_Main);
+    sliderRep->SetValue(scaling_Start);
     //sliderRep->SetTitleText("Scale");
 
     // Set color properties:
@@ -610,7 +610,7 @@ void LeapWindow::updateMe()
         {
             pointWidget->GetProperty()->SetColor(1.0, 1.0, 1.0);
             global_SphereActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(scaling_Main);
+            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(scaling_Start);
             std::cout << "--------------------------------------------------" << endl;
 //            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1,0);
 
@@ -794,18 +794,16 @@ void LeapWindow::updateMe()
 
 //                  static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(colourRange,1,1-colourRange);
 
-                if (scaleFactor > 1.0000001)            /// SHRINKING
-                                {
-                                     static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition );
-                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-colourRange,0,1);
-                    //             static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-colourRange,0,1);
-                                }
-                else                                           /// EXPANDING
-                                {
-                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition );
-                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,0,colourRange-1);
-                    //          static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,0,colourRange-1);
-                                }
+                if (scaleFactor > 1.0000001)            /// EXPANDING .... ColourRange Getting SMALLER - Blue Adjustment
+                {
+                     static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition );
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(colourRange,colourRange,1);
+                }
+                else                                           /// SCHINKING.... ColourRange Getting BIGGER -- Red Adjustment
+                {
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition );
+                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,1-colourRange,1-colourRange);
+                }
 //                               else
 //                                {
 //                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,1,1);

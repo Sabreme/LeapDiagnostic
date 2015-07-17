@@ -95,8 +95,7 @@ private:
 
     int64_t global_ScaleFactorID ;  // Last  Frames Counted.
     double scaling_Max = 40;
-    double scaling_Main = 10;
-    double scaling_Mid = 20;
+    double scaling_Start = 10;
     double scaling_Min = 5;
 
 
