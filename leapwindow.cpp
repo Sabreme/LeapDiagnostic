@@ -301,11 +301,10 @@ void LeapWindow::LoadSlider()
     sliderRep->SetMinimumValue(scaling_Min);
     sliderRep->SetMaximumValue(scaling_Max);
     sliderRep->SetValue(scaling_Start);
-    //sliderRep->SetTitleText("Scale");
 
     // Set color properties:
     // Change the color of the knob that slides
-    sliderRep->GetSliderProperty()->SetColor(0,1,0);//red
+    sliderRep->GetSliderProperty()->SetColor(0,1,0);//Green
 
     // Change the color of the text indicating what the slider controls
     sliderRep->GetTitleProperty()->SetColor(1,0,0);//red
@@ -322,9 +321,11 @@ void LeapWindow::LoadSlider()
 
     // Change the color of the bar
     sliderRep->GetTubeProperty()->SetColor(1,1,1);//white
+    sliderRep->GetTubeProperty()->SetLineWidth(3);
 
     // Change the color of the ends of the bar
-    sliderRep->GetCapProperty()->SetColor(0,0,1);//yellow
+    sliderRep->GetCapProperty()->SetColor(0,1,0);//Green
+    sliderRep->GetCapProperty()->SetLineWidth(2);
 
     sliderRep->GetPoint1Coordinate()->SetCoordinateSystemToDisplay();
     sliderRep->GetPoint1Coordinate()->SetValue(450 ,420);
