@@ -94,9 +94,10 @@ private:
     double global_CameraPosition;
 
     int64_t global_ScaleFactorID ;  // Last  Frames Counted.
-    double scaling_Max = 10;
-    double scaling_Mid = 5;
-    double scaling_Min = 0;
+    double scaling_Max = 40;
+    double scaling_Main = 10;
+    double scaling_Mid = 20;
+    double scaling_Min = 5;
 
 
 

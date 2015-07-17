@@ -300,18 +300,22 @@ void LeapWindow::LoadSlider()
 
     sliderRep->SetMinimumValue(scaling_Min);
     sliderRep->SetMaximumValue(scaling_Max);
-    sliderRep->SetValue(scaling_Mid);
-    sliderRep->SetTitleText("Scale");
+    sliderRep->SetValue(scaling_Main);
+    //sliderRep->SetTitleText("Scale");
 
     // Set color properties:
     // Change the color of the knob that slides
-    sliderRep->GetSliderProperty()->SetColor(1,0,0);//red
+    sliderRep->GetSliderProperty()->SetColor(0,1,0);//red
 
     // Change the color of the text indicating what the slider controls
     sliderRep->GetTitleProperty()->SetColor(1,0,0);//red
 
     // Change the color of the text displaying the value
     sliderRep->GetLabelProperty()->SetColor(1,0,0);//red
+
+    //Change the color of the text displaying the value location
+    ///sliderRep->GetLabelProperty()->SetLineOffset(20);
+    sliderRep->ShowSliderLabelOff();
 
     // Change the color of the knob when the mouse is held on it
     sliderRep->GetSelectedProperty()->SetColor(0,1,0);//green
@@ -323,9 +327,9 @@ void LeapWindow::LoadSlider()
     sliderRep->GetCapProperty()->SetColor(0,0,1);//yellow
 
     sliderRep->GetPoint1Coordinate()->SetCoordinateSystemToDisplay();
-    sliderRep->GetPoint1Coordinate()->SetValue(400 ,100);
+    sliderRep->GetPoint1Coordinate()->SetValue(450 ,420);
     sliderRep->GetPoint2Coordinate()->SetCoordinateSystemToDisplay();
-    sliderRep->GetPoint2Coordinate()->SetValue(500, 100);
+    sliderRep->GetPoint2Coordinate()->SetValue(150, 420);
 
     global_Slider  = vtkSliderWidget::New();
     global_Slider->SetInteractor(this->ui->widget->GetInteractor());
@@ -606,8 +610,9 @@ void LeapWindow::updateMe()
         {
             pointWidget->GetProperty()->SetColor(1.0, 1.0, 1.0);
             global_SphereActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(scaling_Mid);
-            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1,0);
+            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(scaling_Main);
+            std::cout << "--------------------------------------------------" << endl;
+//            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1,0);
 
         }
 
@@ -740,7 +745,7 @@ void LeapWindow::updateMe()
                 /// We also have a skip value to true to not invert the slider.
 
                 bool do_Invert = true;
-                if (abs(controller_->frame(1).id() - global_ScaleFactorID) > 2 )
+                if (abs(controller_->frame(1).id() - global_ScaleFactorID) > 15 )
                 {
                     global_CameraPosition = static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetValue();
                     std::cout << "Return focus" << endl;
@@ -758,11 +763,16 @@ void LeapWindow::updateMe()
                 //double oldPosition = global_CameraPosition;
 
                 ///global_CameraPosition = global_CameraPosition / scaleFactor;     -- ORIGINAL
-                global_CameraPosition = oldPosition / (scaleFactor);
+                global_CameraPosition = oldPosition / (scaleFactor) ;
 
                 double newPosition = global_CameraPosition;
 
-                double reversePosition = scaling_Max - newPosition;
+//                /// Overflow Buffer
+//                if (newPosition >= scaling_Max)
+//                    newPosition =- scaling_Max;
+
+                //double reversePosition = scaling_Max - newPosition;
+                double reversePosition = newPosition;
 
 
 
@@ -770,23 +780,56 @@ void LeapWindow::updateMe()
 //                    newPosition = 1 / global_CameraPosition;         /// Used to Invert Slider Position expand/contract
 
 
-                static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition);
+
 
                 /// We add color chromatic scale to the Slider Widget Propoert to highligh strength
 
-                double colourRange = (reversePosition /  scaling_Max) + 0.2;
-                if (colourRange < 0.5)
-                {
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-colourRange,colourRange,0);
-                }
-                else if (colourRange > 0.5)
-                {
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1-colourRange,colourRange);
-                }
+                double colourRange = (reversePosition /  scaling_Max) ;
+
+                if (colourRange < 0) colourRange = 0;
                 else
-                {
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(0,1,0);
-                }
+                if(colourRange > 1) colourRange = 1;
+
+                 static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition);
+
+//                  static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(colourRange,1,1-colourRange);
+
+                if (scaleFactor > 1.0000001)            /// SHRINKING
+                                {
+                                     static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition );
+                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-colourRange,0,1);
+                    //             static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-colourRange,0,1);
+                                }
+                else                                           /// EXPANDING
+                                {
+                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition );
+                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,0,colourRange-1);
+                    //          static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,0,colourRange-1);
+                                }
+//                               else
+//                                {
+//                                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,1,1);
+//                                }
+
+
+
+
+//                if (colourRange < 0.5)
+//                {
+//                     static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition + 2);
+//                    colourRange += 0.2;
+//                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,colourRange,colourRange);
+//                }
+//                else if (colourRange > 0.5)
+//                {
+//                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(reversePosition + 4);
+//                    colourRange += 0.4;
+//                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1-colourRange,1-colourRange,1);
+//                }
+//                else
+//                {
+//                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,1,1);
+//                }
 
 
                  std::cout  << "scaleFactor: " << scaleFactor
