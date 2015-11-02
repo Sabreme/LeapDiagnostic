@@ -46,6 +46,7 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 
 #include "vtkSliderRepresentation2D.h"
+#include "vtkSliderRepresentation3D.h"
 #include "vtkTextProperty.h"
 #include "vtkProperty2D.h"
 
@@ -295,8 +296,8 @@ void LeapWindow::LoadPointer()
 
 void LeapWindow::LoadSlider()
 {
-    vtkSmartPointer<vtkSliderRepresentation2D> sliderRep =
-      vtkSmartPointer<vtkSliderRepresentation2D>::New();
+    vtkSmartPointer<vtkSliderRepresentation3D> sliderRep =
+      vtkSmartPointer<vtkSliderRepresentation3D>::New();
 
     sliderRep->SetMinimumValue(scaling_Min);
     sliderRep->SetMaximumValue(scaling_Max);
@@ -307,10 +308,12 @@ void LeapWindow::LoadSlider()
     sliderRep->GetSliderProperty()->SetColor(0,1,0);//Green
 
     // Change the color of the text indicating what the slider controls
-    sliderRep->GetTitleProperty()->SetColor(1,0,0);//red
+///    sliderRep->GetTitleProperty()->SetColor(1,0,0);//red
+
 
     // Change the color of the text displaying the value
-    sliderRep->GetLabelProperty()->SetColor(1,0,0);//red
+ ///   sliderRep->GetLabelProperty()->SetColor(1,0,0);//red
+///    sliderRep->
 
     //Change the color of the text displaying the value location
     sliderRep->ShowSliderLabelOff();
@@ -325,6 +328,11 @@ void LeapWindow::LoadSlider()
     // Change the color of the ends of the bar
     sliderRep->GetCapProperty()->SetColor(0,1,0);//Green
     sliderRep->GetCapProperty()->SetLineWidth(2);
+
+//    sliderRep->GetPoint1Coordinate()->SetCoordinateSystemToDisplay();
+//    sliderRep->GetPoint1Coordinate()->SetValue(450 ,420);
+//    sliderRep->GetPoint2Coordinate()->SetCoordinateSystemToDisplay();
+//    sliderRep->GetPoint2Coordinate()->SetValue(150, 420);
 
     sliderRep->GetPoint1Coordinate()->SetCoordinateSystemToDisplay();
     sliderRep->GetPoint1Coordinate()->SetValue(450 ,420);
@@ -606,7 +614,7 @@ void LeapWindow::updateMe()
         {
             pointWidget->GetProperty()->SetColor(1.0, 1.0, 1.0);
             global_SphereActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-            static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(scaling_Start);
+            static_cast<vtkSliderRepresentation3D*>(global_Slider->GetRepresentation())->SetValue(scaling_Start);
         }
 
 
@@ -733,7 +741,7 @@ void LeapWindow::updateMe()
                 bool do_Invert = true;
                 if (abs(controller_->frame(1).id() - global_ScaleFactorID) > 15 )
                 {
-                    global_CameraPosition = static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetValue();
+                    global_CameraPosition = static_cast<vtkSliderRepresentation3D*>(global_Slider->GetRepresentation())->GetValue();
 //                    std::cout << "Return focus" << endl;
                     do_Invert = false;
                 }
@@ -758,13 +766,13 @@ void LeapWindow::updateMe()
 
                 if (scaleFactor > 1.0000001)            /// EXPANDING .... ColourRange Getting SMALLER - Blue Adjustment
                 {
-                     static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(newPosition );
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(colourRange,colourRange,1);
+                     static_cast<vtkSliderRepresentation3D*>(global_Slider->GetRepresentation())->SetValue(newPosition );
+                    static_cast<vtkSliderRepresentation3D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(colourRange,colourRange,1);
                 }
                 else                                           /// SCHINKING.... ColourRange Getting BIGGER -- Red Adjustment
                 {
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->SetValue(newPosition );
-                    static_cast<vtkSliderRepresentation2D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,1-colourRange,1-colourRange);
+                    static_cast<vtkSliderRepresentation3D*>(global_Slider->GetRepresentation())->SetValue(newPosition );
+                    static_cast<vtkSliderRepresentation3D*>(global_Slider->GetRepresentation())->GetTubeProperty()->SetColor(1,1-colourRange,1-colourRange);
                 }
 
 //                 std::cout  << "scaleFactor: " << scaleFactor
