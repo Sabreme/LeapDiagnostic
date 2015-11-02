@@ -36,6 +36,8 @@ public:
     void LoadAxisArrow();
     void LoadPlane();
     void LoadFingers();
+
+    void LoadBones();
     void LoadFingerTips();
     void LoadAxes();
     void LoadPointer();
@@ -75,6 +77,7 @@ private:
     vtkActor                    * global_ArrowActor;
     vtkActor                    * global_FingerTip[5];
     vtkLineWidget               * global_Fingers[5];
+    vtkLineWidget               * global_Bones[5][4];
     vtkLegendScaleActor         * global_Legend;
     vtkLeapScaleActor           * global_LeapLegend;    
 

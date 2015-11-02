@@ -486,6 +486,20 @@ void LeapWindow::LoadFingers()
 
 }
 
+void LeapWindow::LoadBones()
+{
+    for (int f = 0; f < 5; f++)
+    {
+        for (int b = 0; b < 4 ; b++)
+        {
+            global_Bones[f][b] = vtkLineWidget::New();
+            global_Bones[f][b]->SetInteractor(this->ui->widget->GetRenderWindow()->GetInteractor());
+        }
+    }
+}
+
+
+
 void LeapWindow::LoadFingerTips()
 {
     ///Fingertip Start Positions
@@ -514,7 +528,7 @@ void LeapWindow::LoadFingerTips()
 
     vtkSmartPointer<vtkSphereSource> fingerTipSource =
             vtkSmartPointer<vtkSphereSource>::New();
-    fingerTipSource->SetRadius(0.08);
+    fingerTipSource->SetRadius(0.05);
 
     vtkSmartPointer<vtkPolyDataMapper> mapper =
             vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -808,11 +822,28 @@ void LeapWindow::updateMe()
                     const Leap::FingerList fingers = frame.fingers();
                     double handDropPos = 1;
 
+                    for (Leap::FingerList::const_iterator f1 = fingers.begin(); f1 != fingers.end(); f1++)
+                    {
+                        Leap::Bone bone;
+                        Leap::Bone::Type boneType;
+                        for(int b = 0; b < 4; b++)
+                        {
+                            boneType = static_cast<Leap::Bone::Type>(b);
+                            bone = (*f1).bone(boneType);
+                            std::cout << "Finger index: " << (*f1).type() << " " << bone <<  "x1" << std::endl;
+                        }
+                    };
+
                     for(int i =0; i < fingers.count(); i++)
                     {
                         const Leap::Finger finger = fingers[i];
+//                        Leap::Vector vStartPos = mtxFrameTransform.transformPoint(finger.stabilizedTipPosition() * frameScale);
+//                        Leap::Vector vEndPos = mtxFrameTransform.transformDirection(finger.direction()) * 30;
+
                         Leap::Vector vStartPos = mtxFrameTransform.transformPoint(finger.stabilizedTipPosition() * frameScale);
                         Leap::Vector vEndPos = mtxFrameTransform.transformDirection(finger.direction()) * 30;
+
+                        //Leap::Vector v
 
                         if (this->ui->checkBoxFingerTips->isChecked())
                         {                                                        
@@ -877,6 +908,81 @@ void LeapWindow::updateMe()
                             global_Fingers[i]->On();
 
                             output = newDistance;
+                        }
+
+                        /// NEW BONES DISPLAY Lines (SHOULD BE Very NON CONFUSING confusing)
+                        if (this->ui->checkBoxBones->isChecked())
+                        {
+//                            double startPoint [3] = {vStartPos.x, vStartPos.y -handDropPos, vStartPos.z} ;
+//                            double endPoint [3] = {vEndPos.x, vEndPos.y -handDropPos, vEndPos.z};
+
+                            for (int b = 0; b <  4 ; b++)
+                            {
+//                                global_Bones[i][b]->SetPoint1
+//                                        (
+//                                            finger.bone.prevJoint().x,
+//                                            finger.bone.prevJoint().y,
+//                                            finger.bone.prevJoint().z,
+//                                            );
+
+//                                global_Bones[i][b]->SetPoint2
+//                                        (
+//                                            finger.bone.nextJoint().x,
+//                                            finger.bone.nextJoint().y,
+//                                            finger.bone.nextJoint().z,
+//                                            );
+
+                               global_Bones[i][b]->GetLineProperty()->SetColor(global_FingerClr[i]);
+                                //global_Fingers[i]->SetPoint2(vEndPos.x, vEndPos.y , vEndPos.z);
+
+
+                                global_Bones[i][b]->On();
+
+                            }
+//                            double startPoint [3] = {vStartPos.x, vStartPos.y, vStartPos.z} ;
+//                            double endPoint [3] = {vEndPos.x, vEndPos.y, vEndPos.z};
+//                            double radius = 25;
+
+//                          //  std::cout  << "endPoint A: " << endPoint[0] << ","  << endPoint[1] << ","  << endPoint[2] << "\t" << endl;
+
+
+//                            //// SHORT LINE FUNCTION C++ Too Silly for Simple Array Return Function
+//                            /// Basically generates a line between 2 vectors which are 3D points
+//                            double dx = endPoint[0] - startPoint[0];
+//                            double dy = endPoint[1] - startPoint[1];
+//                            double dz = endPoint[2] - startPoint[2];
+
+//                         //   std::cout << "A dx = " << dx << "A dy = " << dy << "A dz = " << dz << endl;
+
+//                            double length = std::sqrt(dx * dx + dy * dy + dz * dz);
+
+//                            if (length > 0)
+//                            {
+//                                dx /=length;
+//                                dy /=length;
+//                                dz /=length;
+//                            }
+
+
+//                            dx *= length - radius;
+//                            dy *= length - radius;
+//                            dz *= length - radius;
+
+//                          //  std::cout << "B dx = " << dx << "B dy = " << dy << "B dz = " << dz << endl;
+
+
+//                            double newDistance[3] = {
+//                                                     startPoint[0] + dx,
+//                                                     startPoint[1] + dy,
+//                                                     startPoint[2] + dz
+//                                                    };
+
+                          //  std::cout  << "endPointB: " << newDistance[0] << ","  << newDistance[1] << ","  << newDistance[2] << "\t" << endl;
+
+                            //global_Fingers[i]->SetPoint1(vStartPos.x, vStartPos.y, vStartPos.z);
+                            ///global_Fingers[i]->SetPoint1(startPoint);
+
+
                         }
                     }
                 }
